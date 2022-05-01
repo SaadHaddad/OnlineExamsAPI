@@ -1,5 +1,9 @@
 from django.db import models
 
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 # Create your models here.
 
 
@@ -9,6 +13,7 @@ class Profile(models.Model):  # add this class and the following fields
     note = models.IntegerField(
         default=0, null=True, blank=True)
     state = models.BooleanField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
    # finished = models.BooleanField(default=0)
 
     def __str__(self):
@@ -39,7 +44,7 @@ class Question(models.Model):  # add this class and the following fields
 class ExamAnswer(models.Model):  # add this class and the following fields
     question_title = models.CharField(max_length=500)
     answer = models.CharField(max_length=500)
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
     def __str__(self):

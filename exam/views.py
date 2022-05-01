@@ -1,19 +1,48 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .models import Quiz, Question, ExamAnswer, Profile
-from .serializer import ExamAnswerSerializer, ProfileSerializer, QuestionSerializer, QuizSerializer
+from .models import Quiz, Question, ExamAnswer, Profile, User
+from .serializer import ExamAnswerSerializer, ExamResultSerializer, Profile1Serializer, ProfileSerializer, QuestionExamSerializer, QuestionSerializer, QuizSerializer, UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 # Create your views here.
 from django.http import Http404
+
+from rest_framework.permissions import IsAuthenticated
 
 
 def fun(request):
     return JsonResponse({'sssss': 'sss'})
 
 
+class User_List(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        guests = User.objects.all()
+        serializer = UserSerializer(guests, many=True)
+        return Response(serializer.data)
+
+
+class User_result_pk(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get_object(self, pk):
+        try:
+            return ExamAnswer.objects.filter(user=pk)
+        except ExamAnswer.DoesNotExists:
+            raise Http404
+
+    def get(self, request, pk):
+        guest = self.get_object(pk)
+        serializer = ExamResultSerializer(guest, many=True)
+        return Response(serializer.data)
+
+
 class Quiz_List(APIView):
+
+    permission_classes = (IsAuthenticated, )
+
     def get(self, request):
         guests = Quiz.objects.all()
         serializer = QuizSerializer(guests, many=True)
@@ -28,15 +57,14 @@ class Quiz_List(APIView):
                 status=status.HTTP_201_CREATED
             )
         return Response(
-            serializer.data,
+            serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
 
 
-# 4.2 GET PUT DELETE cloass based views - - pk
-
-
+# ------------------------- quiz--------------------------------
 class Quiz_pk(APIView):
+    permission_classes = (IsAuthenticated, )
 
     def get_object(self, pk):
         try:
@@ -66,6 +94,8 @@ class Quiz_pk(APIView):
 
 
 class Answer_List(APIView):
+    permission_classes = (IsAuthenticated, )
+
     def get(self, request):
         guests = ExamAnswer.objects.all()
         serializer = ExamAnswerSerializer(guests, many=True)
@@ -80,12 +110,14 @@ class Answer_List(APIView):
                 status=status.HTTP_201_CREATED
             )
         return Response(
-            serializer.data,
+            serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
 
 
 class Answer_pk(APIView):
+
+    permission_classes = (IsAuthenticated, )
 
     def get_object(self, pk):
         try:
@@ -114,7 +146,18 @@ class Answer_pk(APIView):
 
 # ------------------------- Question--------------------------------
 
+class QuestionExam_List(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        guests = Question.objects.all()
+        serializer = QuestionExamSerializer(guests, many=True)
+        return Response(serializer.data)
+
+
 class Question_List(APIView):
+    permission_classes = (IsAuthenticated, )
+
     def get(self, request):
         guests = Question.objects.all()
         serializer = QuestionSerializer(guests, many=True)
@@ -129,12 +172,13 @@ class Question_List(APIView):
                 status=status.HTTP_201_CREATED
             )
         return Response(
-            serializer.data,
+            serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
 
 
 class Question_pk(APIView):
+    permission_classes = (IsAuthenticated, )
 
     def get_object(self, pk):
         try:
@@ -163,12 +207,15 @@ class Question_pk(APIView):
 
 
 class Profile_List(APIView):
+    permission_classes = (IsAuthenticated, )
+
     def get(self, request):
         guests = Profile.objects.all()
-        serializer = ProfileSerializer(guests, many=True)
+        serializer = Profile1Serializer(guests, many=True)
         return Response(serializer.data)
 
     def post(self, request):
+
         serializer = ProfileSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -177,12 +224,13 @@ class Profile_List(APIView):
                 status=status.HTTP_201_CREATED
             )
         return Response(
-            serializer.data,
+            serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
 
 
 class Profile_pk(APIView):
+    permission_classes = (IsAuthenticated, )
 
     def get_object(self, pk):
         try:
