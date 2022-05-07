@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
@@ -7,12 +8,29 @@ from rest_framework.response import Response
 from rest_framework import status
 # Create your views here.
 from django.http import Http404
-
 from rest_framework.permissions import IsAuthenticated
 
 
-def fun(request):
-    return JsonResponse({'sssss': 'sss'})
+class Fun(APIView):
+    def post(self, request, user_id):
+
+        answers = request.data.get('data')
+        is_many = isinstance(answers, list)
+
+        if not is_many:
+            serializer = ExamAnswerSerializer(data=answers)
+            if serializer.is_valid():
+                serializer.save()
+                # update user state
+                Profile.objects.filter(user=user_id).update(state=True)
+                return Response(answers, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = ExamAnswerSerializer(data=answers, many=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                Profile.objects.filter(user=user_id).update(state=True)
+                return Response(answers, status=status.HTTP_201_CREATED)
 
 
 class User_List(APIView):
@@ -149,10 +167,14 @@ class Answer_pk(APIView):
 class QuestionExam_List(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
-        guests = Question.objects.all()
-        serializer = QuestionExamSerializer(guests, many=True)
-        return Response(serializer.data)
+    def get(self, request, pk):
+        prof = Profile.objects.get(pk=pk)
+        if prof.state:
+            return Response("No Question")
+        else:
+            guests = Question.objects.all()
+            serializer = QuestionExamSerializer(guests, many=True)
+            return Response(serializer.data)
 
 
 class Question_List(APIView):
