@@ -2,7 +2,9 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
-
+import smtplib
+from django.core.mail import send_mail
+from django.conf import settings
 from .models import Quiz, Question, ExamAnswer, Profile, User
 from .serializer import ExamAnswerSerializer, ExamResultSerializer, MyTokenObtainPairSerializer, Profile1Serializer, ProfileSerializer, QuestionExamSerializer, QuestionSerializer, QuizSerializer, UserLoginSerializer, UserRegistrationSerializer, UserSerializer
 from rest_framework.response import Response
@@ -13,6 +15,20 @@ from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 # create user
+
+
+def sendMail(recipient):
+
+    subject = "Information de votre compte"
+    email = []
+    email.append(recipient)
+    password = recipient
+
+    message = "bonjour!\n email: \n \t "+recipient+"\n mote de pass : \n \t" + \
+        password+"\n \t site : http://quiz.skycode-dz.com ."
+
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,
+              email, fail_silently=False)
 
 
 class LoginView(TokenObtainPairView):
@@ -29,6 +45,7 @@ class UserRegistrationView(CreateAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        sendMail(request.data.get('email'))
         status_code = status.HTTP_201_CREATED
         response = {
             'success': 'True',
@@ -44,7 +61,6 @@ class Fun(APIView):
 
         answers = request.data.get('data')
         is_many = isinstance(answers, list)
-        print(request.data)
         if not is_many:
             serializer = ExamAnswerSerializer(data=answers)
             if serializer.is_valid():
@@ -59,6 +75,7 @@ class Fun(APIView):
                 serializer.save()
                 Profile.objects.filter(pk=user_id).update(state=True)
                 return Response(answers, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class User_List(APIView):
@@ -214,17 +231,21 @@ class Question_List(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = QuestionSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+
+        question = request.data
+        is_many = isinstance(question, list)
+        if not is_many:
+            serializer = QuestionSerializer(data=question)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(question, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = QuestionSerializer(data=question, many=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(question, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Question_pk(APIView):

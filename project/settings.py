@@ -28,6 +28,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+DEFAULT_FROM_EMAIL = 'contact@quiz.skycode-dz.com'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.skycode-dz.com'
+EMAIL_HOST_USER = 'contact@quiz.skycode-dz.com'
+EMAIL_HOST_PASSWORD = 'saad12345@$'
+EMAIL_PORT = 26
+EMAIL_USE_TLS = True
 
 # Application definition
 
@@ -110,19 +118,18 @@ DATABASES = {
 #     }
 # }
 
+
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'saad',
-#         'USER': 'saad',
-#         'PASSWORD': '',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#         'OPTIONS': {
-#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-#         }
+#         'ENGINE'  : 'django.db.backends.mysql', # <-- UPDATED line
+#         'NAME'    : 'skycod05_quiz',                 # <-- UPDATED line
+#         'USER'    : 'skycod05_saad',                     # <-- UPDATED line
+#         'PASSWORD': 'Jf}cWh11i(jJ',              # <-- UPDATED line
+#         'HOST'    : 'localhost',                # <-- UPDATED line
+#         'PORT'    : '3306',
 #     }
 # }
+
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
