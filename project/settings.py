@@ -122,9 +122,9 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE'  : 'django.db.backends.mysql', # <-- UPDATED line
-#         'NAME'    : 'skycod05_quiz',                 # <-- UPDATED line
-#         'USER'    : 'skycod05_saad',                     # <-- UPDATED line
-#         'PASSWORD': 'Jf}cWh11i(jJ',              # <-- UPDATED line
+#         'NAME'    : 'name',                 # <-- UPDATED line
+#         'USER'    : 'user',                     # <-- UPDATED line
+#         'PASSWORD': 'Jf}pass(jJ',              # <-- UPDATED line
 #         'HOST'    : 'localhost',                # <-- UPDATED line
 #         'PORT'    : '3306',
 #     }
