@@ -14,11 +14,11 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         print(data)
         token = self.get_token(self.user)
-        
+
         data['email'] = self.user.email
         profile = Profile.objects.get(user=self.user)
         data['feild'] = profile.field
-        data['full_name'] = profile.field
+        data['full_name'] = profile.full_name
         data['state'] = profile.state
         data['id'] = profile.id
         return data

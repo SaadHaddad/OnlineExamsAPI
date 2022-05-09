@@ -1,9 +1,8 @@
-from asyncio.windows_events import NULL
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
-from rest_framework.generics import RetrieveAPIView
+
 from .models import Quiz, Question, ExamAnswer, Profile, User
 from .serializer import ExamAnswerSerializer, ExamResultSerializer, MyTokenObtainPairSerializer, Profile1Serializer, ProfileSerializer, QuestionExamSerializer, QuestionSerializer, QuizSerializer, UserLoginSerializer, UserRegistrationSerializer, UserSerializer
 from rest_framework.response import Response
@@ -36,25 +35,6 @@ class UserRegistrationView(CreateAPIView):
             'status code': status_code,
             'message': 'User registered  successfully',
         }
-
-        return Response(response, status=status_code)
-
-
-class UserLoginView(RetrieveAPIView):
-
-    permission_classes = (AllowAny,)
-    serializer_class = UserLoginSerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        response = {
-            'success': 'True',
-            'status code': status.HTTP_200_OK,
-            'message': 'User logged in  successfully',
-            'token': serializer.data['token'],
-        }
-        status_code = status.HTTP_200_OK
 
         return Response(response, status=status_code)
 
